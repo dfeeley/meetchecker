@@ -1,0 +1,37 @@
+---
+file: '/home/dave/Projects/meetchecker/resources/dsd-01.mdb'
+output: '/home/dave/Projects/meetchecker/resources/dsd.html'
+checks:
+  - new_rancho_pool_record:
+      run: true
+      checker: meetchecker.checkers.set_new_record
+      params: 
+        record_name: '2022pool'
+  - new_rancho_team_record:
+      run: true
+      checker: meetchecker.checkers.set_new_record
+      params: 
+        record_name: '2022team'
+        team_filter: 'RC'
+  - bettered_county_time:
+      run: true
+      checker: meetchecker.checkers.compare_vs_time_standard
+      params:
+        time_standard: CNTY
+  - big_pop:
+      checker: meetchecker.checkers.popped_by_percent_threshold
+      params:
+        threshold: 15.0
+  - only_one_pad_time:
+      run: true
+      checker: meetchecker.checkers.only_n_or_fewer_pad_times
+      params:
+        n: 1
+  - ns_but_pad_times:
+      run: true
+      checker: meetchecker.checkers.ns_but_pad_times
+  - all_in_heat_popped:
+      run: false
+      checker: meetchecker.checkers.all_in_heat_popped
+      params:
+        min_swimmers: 3

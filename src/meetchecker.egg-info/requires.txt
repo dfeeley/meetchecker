@@ -1,0 +1,6 @@
+pandas
+
+[dev]
+black
+pip-tools
+pytest

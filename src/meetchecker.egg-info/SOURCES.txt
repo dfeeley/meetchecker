@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST.in
+README.md
+pyproject.toml
+setup.py
+src/meetchecker/__main__.py
+src/meetchecker.egg-info/PKG-INFO
+src/meetchecker.egg-info/SOURCES.txt
+src/meetchecker.egg-info/dependency_links.txt
+src/meetchecker.egg-info/entry_points.txt
+src/meetchecker.egg-info/requires.txt
+src/meetchecker.egg-info/top_level.txt

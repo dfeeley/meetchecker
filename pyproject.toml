@@ -1,0 +1,33 @@
+[build-system]
+requires      = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "meetchecker"
+version = "1.0.0"
+description = "Quality Control checks for a Hytek Meet Manager swim meet"
+readme = "README.md"
+authors = [{ name = "David Feeley", email = "davidpfeeley@gmail.com" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["swim", "hytek", "meet manager"]
+dependencies = [
+    "pandas",
+	"pyyaml",
+]
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+dev = ["black", "pip-tools", "pytest"]
+
+[project.scripts]
+checkmeet = "meetchecker.__main__:main"
+
+[tool.pytest.ini_options]
+testpaths = [
+	"tests",
+]
