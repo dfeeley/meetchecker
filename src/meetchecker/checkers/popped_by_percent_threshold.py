@@ -18,6 +18,7 @@ class Checker(BaseChecker):
         return entry.loc[
             (entry.fin_stat != "R")
             & (entry.fin_stat != "Q")
+            & (entry.fin_heat != 0)
             & (entry.popped_by > 0)
             & (100 * entry.popped_by / entry.actualseed_time >= self.threshold),
         ]

@@ -1,25 +1,25 @@
 ---
-# file: '/home/dave/Projects/meetchecker/resources/dsd-01.mdb'
-# output: '/home/dave/Projects/meetchecker/resources/dsd.html'
-file: '/home/dave/Projects/meetchecker/resources/MCC@RanchoMay2022.mdb'
-output: '/home/dave/Projects/meetchecker/resources/mcc.html'
+file: '/home/dave/Projects/meetchecker/resources/dsd-01.mdb'
+output: '/home/dave/Projects/meetchecker/resources/dsd.html'
+# file: '/home/dave/Projects/meetchecker/resources/MCC@RanchoMay2022.mdb'
+# output: '/home/dave/Projects/meetchecker/resources/mcc.html'
 checks:
   - is_a_relay:
       run: false
       checker: meetchecker.checkers.is_a_relay
   - new_rancho_pool_record:
-      run: true
+      run: false
       checker: meetchecker.checkers.set_new_record
       params: 
         record_name: '2022pool'
   - new_rancho_team_record:
-      run: true
+      run: false
       checker: meetchecker.checkers.set_new_record
       params: 
         record_name: '2022team'
         team_filter: 'RC'
   - bettered_county_time:
-      run: true
+      run: false
       checker: meetchecker.checkers.compare_vs_time_standard
       params:
         time_standard: CNTY
@@ -29,17 +29,23 @@ checks:
       params:
         time_standard: WHO
   - big_pop:
+      run: false
       checker: meetchecker.checkers.popped_by_percent_threshold
       params:
         threshold: 15.0
   - only_one_pad_time:
-      run: true
+      run: false
       checker: meetchecker.checkers.only_n_or_fewer_pad_times
       params:
         n: 1
   - ns_but_pad_times:
       run: true
       checker: meetchecker.checkers.ns_but_pad_times
+  - two_pad_times_and_inconsistent:
+      run: true
+      checker: meetchecker.checkers.two_pad_times_and_inconsistent
+      params:
+        threshold: 0.1
   - all_in_heat_popped:
       run: false
       checker: meetchecker.checkers.all_in_heat_popped

@@ -120,13 +120,28 @@ def calc_num_pad_times(row):
     return len([v for v in values if v and not math.isnan(v)])
 
 
+def calc_max_pad_time(row):
+    values = [getattr(row, attr) for attr in ("fin_back1", "fin_back2", "fin_back3")]
+    values = [v for v in values if v and not math.isnan(v)]
+    return max(values) if values else math.nan
+
+
+def calc_min_pad_time(row):
+    values = [getattr(row, attr) for attr in ("fin_back1", "fin_back2", "fin_back3")]
+    values = [v for v in values if v and not math.isnan(v)]
+    return min(values) if values else math.nan
+
+
 def calc_event_name(row):
     gender = "Boys" if row.event_sex == "B" else "Girls"
     age = f"{row.high_age}&U" if row.low_age == 0 else f"{row.low_age}-{row.high_age}"
     distance = str(int(row.event_dist))
     stroke = STROKE.get(row.event_stroke)
-    if row.ind_rel == "R" and stroke == "IM":
-        stroke = "Medley Relay"
+    if row.ind_rel == "R":
+        if stroke == "IM":
+            stroke = "Medley Relay"
+        else:
+            stroke = f"{stroke} Relay"
     return " ".join([gender, age, distance, stroke])
 
 
@@ -138,6 +153,9 @@ def calc_popped_by(row):
 def relay_calculated_fields(dataframe):
     dataframe["event_name"] = dataframe.apply(calc_event_name, axis=1)
     dataframe["num_pad_times"] = dataframe.apply(calc_num_pad_times, axis=1)
+    dataframe["max_pad_time"] = dataframe.apply(calc_max_pad_time, axis=1)
+    dataframe["min_pad_time"] = dataframe.apply(calc_min_pad_time, axis=1)
+    dataframe["pad_time_spread"] = dataframe["max_pad_time"] - dataframe["min_pad_time"]
     dataframe["popped_by"] = dataframe.apply(calc_popped_by, axis=1)
     dataframe["athlete_name"] = dataframe[["team_name", "team_ltr"]].agg(
         " - ".join, axis=1
@@ -184,6 +202,10 @@ def dump_and_load_table(mdb_filepath, table, columns):
     df = pd.read_csv(
         io.StringIO(data),
         usecols=columns,
-        converters={"Last_name": str.strip, "First_name": str.strip},
+        converters={
+            "Last_name": str.strip,
+            "First_name": str.strip,
+            "Team_name": str.strip,
+        },
     )
     return df.rename(str.lower, axis="columns")
