@@ -14,10 +14,10 @@ class Checker(BaseChecker):
         )
 
     def check(self, data):
-        entries = data["entries"]
-        return entries.loc[
-            (entries.fin_stat != "R")
-            & (entries.fin_stat != "Q")
-            & (entries.popped_by > 0)
-            & (100 * entries.popped_by / entries.actualseed_time >= self.threshold),
+        entry = data["entry"]
+        return entry.loc[
+            (entry.fin_stat != "R")
+            & (entry.fin_stat != "Q")
+            & (entry.popped_by > 0)
+            & (100 * entry.popped_by / entry.actualseed_time >= self.threshold),
         ]

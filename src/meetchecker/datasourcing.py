@@ -1,6 +1,6 @@
 import io
 import math
-import pandas
+import pandas as pd
 import subprocess
 
 STROKE = dict(
@@ -14,7 +14,7 @@ STROKE = dict(
 
 columns = dict(
     athlete=["Ath_no", "Last_name", "First_name", "Team_no"],
-    team=["Team_no", "Team_abbr"],
+    team=["Team_no", "Team_abbr", "Team_name"],
     event=[
         "Event_no",
         "Event_ptr",
@@ -25,21 +25,6 @@ columns = dict(
         "Event_stroke",
         "Low_age",
         "High_Age",
-    ],
-    entry=[
-        "Event_ptr",
-        "Ath_no",
-        "ActualSeed_time",
-        "Fin_heat",
-        "Fin_lane",
-        "Fin_stat",
-        "Fin_Time",
-        "Fin_heatplace",
-        "Fin_back1",
-        "Fin_back2",
-        "Fin_back3",
-        "Fin_pad",
-        "fin_adjuststat",
     ],
     tagnames=[
         "tag_ptr",
@@ -72,6 +57,38 @@ columns = dict(
         "Record_Holderteam",
         "Record_Time",
     ],
+    relay=[
+        "Event_ptr",
+        "Relay_no",
+        "Team_no",
+        "Team_ltr",
+        "ActualSeed_time",
+        "Fin_heat",
+        "Fin_lane",
+        "Fin_stat",
+        "Fin_Time",
+        "Fin_heatplace",
+        "Fin_back1",
+        "Fin_back2",
+        "Fin_back3",
+        "Fin_pad",
+        "fin_adjuststat",
+    ],
+    entry=[
+        "Event_ptr",
+        "Ath_no",
+        "ActualSeed_time",
+        "Fin_heat",
+        "Fin_lane",
+        "Fin_stat",
+        "Fin_Time",
+        "Fin_heatplace",
+        "Fin_back1",
+        "Fin_back2",
+        "Fin_back3",
+        "Fin_pad",
+        "fin_adjuststat",
+    ],
 )
 
 
@@ -86,10 +103,15 @@ def get_data(mdb_filepath):
         "timestd",
         "records",
         "recordtags",
+        "relay",
     ):
         data[table] = dump_and_load_table(mdb_filepath, table, columns[table])
     data = merge_tables(data)
-    data["entries"] = entries_calculated_fields(data["entries"])
+    entry = entry_calculated_fields(data["entry"])
+    relay = relay_calculated_fields(data["relay"])
+    # concat entry and relay
+    data["entry"] = pd.concat([entry, relay], axis=0)
+    del data["relay"]
     return data
 
 
@@ -113,10 +135,23 @@ def calc_popped_by(row):
         return row.actualseed_time - row.fin_time
 
 
-def entries_calculated_fields(dataframe):
+def relay_calculated_fields(dataframe):
     dataframe["event_name"] = dataframe.apply(calc_event_name, axis=1)
     dataframe["num_pad_times"] = dataframe.apply(calc_num_pad_times, axis=1)
     dataframe["popped_by"] = dataframe.apply(calc_popped_by, axis=1)
+    dataframe["athlete_name"] = dataframe[["team_name", "team_ltr"]].agg(
+        " - ".join, axis=1
+    )
+    return dataframe
+
+
+def entry_calculated_fields(dataframe):
+    dataframe["event_name"] = dataframe.apply(calc_event_name, axis=1)
+    dataframe["num_pad_times"] = dataframe.apply(calc_num_pad_times, axis=1)
+    dataframe["popped_by"] = dataframe.apply(calc_popped_by, axis=1)
+    dataframe["athlete_name"] = dataframe[["last_name", "first_name"]].agg(
+        ", ".join, axis=1
+    )
     return dataframe
 
 
@@ -128,11 +163,14 @@ def merge_tables(data):
         data["recordtags"], left_on="tag_ptr", right_on="tag_ptr"
     )
     athlete = data["athlete"].merge(data["team"], left_on="team_no", right_on="team_no")
-    entries = data["entry"].merge(athlete, left_on="ath_no", right_on="ath_no")
+    entry = data["entry"].merge(athlete, left_on="ath_no", right_on="ath_no")
+    relay = data["relay"].merge(data["team"], left_on="team_no", right_on="team_no")
     event = data["event"]
-    entries = entries.merge(event, left_on="event_ptr", right_on="event_ptr")
+    relay = relay.merge(event, left_on="event_ptr", right_on="event_ptr")
+    entry = entry.merge(event, left_on="event_ptr", right_on="event_ptr")
     return dict(
-        entries=entries,
+        entry=entry,
+        relay=relay,
         time_standards=time_standards,
         records=records,
     )
@@ -143,7 +181,7 @@ def dump_and_load_table(mdb_filepath, table, columns):
     data = subprocess.check_output(cmd, encoding="utf-8")
     with open(f"/tmp/{table}.csv", "w") as f:
         f.write(data)
-    df = pandas.read_csv(
+    df = pd.read_csv(
         io.StringIO(data),
         usecols=columns,
         converters={"Last_name": str.strip, "First_name": str.strip},

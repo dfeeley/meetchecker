@@ -1,33 +1,26 @@
 ---
-# file: '/home/dave/Projects/meetchecker/resources/dsd-01.mdb'
-# output: '/home/dave/Projects/meetchecker/resources/dsd.html'
-file: '/home/dave/Projects/meetchecker/resources/MCC@RanchoMay2022.mdb'
-output: '/home/dave/Projects/meetchecker/resources/mcc.html'
+file: '/path/to/somemeet.mdb'
+output: '/path/to/somemeet.htm'
 checks:
   - is_a_relay:
       run: false
       checker: meetchecker.checkers.is_a_relay
-  - new_rancho_pool_record:
+  - new_pool_record:
       run: true
       checker: meetchecker.checkers.set_new_record
       params: 
-        record_name: '2022pool'
-  - new_rancho_team_record:
+        record_name: 'pool'
+  - new_team_record:
       run: true
       checker: meetchecker.checkers.set_new_record
       params: 
-        record_name: '2022team'
+        record_name: 'team'
         team_filter: 'RC'
   - bettered_county_time:
       run: true
       checker: meetchecker.checkers.compare_vs_time_standard
       params:
         time_standard: CNTY
-  - bettered_wahoo_time:
-      run: false
-      checker: meetchecker.checkers.compare_vs_time_standard
-      params:
-        time_standard: WHO
   - big_pop:
       checker: meetchecker.checkers.popped_by_percent_threshold
       params:

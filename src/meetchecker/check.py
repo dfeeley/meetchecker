@@ -7,8 +7,7 @@ class CheckRecord:
     fin_heat: int
     fin_lane: int
     event_name: str
-    last_name: str
-    first_name: str
+    athlete_name: str
     team_abbr: str
     event_stroke: str
     event_dist: int
@@ -27,7 +26,3 @@ class CheckRecord:
             kwargs = {k: v for k, v in record.items() if k in names}
             retv.append(cls(**kwargs))
         return retv
-
-    @property
-    def athlete_name(self):
-        return f"{self.last_name}, {self.first_name}"

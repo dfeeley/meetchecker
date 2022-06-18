@@ -10,9 +10,9 @@ class Checker(BaseChecker):
         return f"Only got {row.num_pad_times} electronic times"
 
     def check(self, data):
-        entries = data["entries"]
-        return entries[
-            (entries.fin_stat != "R")
-            & (entries.num_pad_times <= self.n)
-            & (entries.num_pad_times > 0)
+        entry = data["entry"]
+        return entry[
+            (entry.fin_stat != "R")
+            & (entry.num_pad_times <= self.n)
+            & (entry.num_pad_times > 0)
         ]

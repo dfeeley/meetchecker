@@ -156,7 +156,5 @@ def console_output(lane_results):
             print(f"Heat: {heat_records[0].fin_heat}")
 
             for lane_result in heat_records:
-                print(
-                    f"  Lane {lane_result.fin_lane} {lane_result.last_name}, {lane_result.first_name}"
-                )
+                print(f"  Lane {lane_result.fin_lane} {lane_result.athlete_name}")
                 print(lane_result.checks_as_str())

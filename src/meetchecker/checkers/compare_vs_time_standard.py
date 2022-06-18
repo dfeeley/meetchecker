@@ -19,8 +19,8 @@ class Checker(BaseChecker):
         time_standards = time_standards[time_standards.tag_name == self.time_standard]
         if len(time_standards) == 0:
             raise ValueError(f"No time standards found for {self.time_standard!r}")
-        entries = data["entries"]
-        entries = entries.merge(
+        entry = data["entry"]
+        entry = entry.merge(
             time_standards,
             left_on=[
                 "event_gender",
@@ -39,8 +39,8 @@ class Checker(BaseChecker):
                 "high_age",
             ],
         )
-        return entries.loc[
-            (entries.fin_stat != "R")
-            & (entries.fin_heat != 0)
-            & (entries.fin_time <= entries.tag_time)
+        return entry.loc[
+            (entry.fin_stat != "R")
+            & (entry.fin_heat != 0)
+            & (entry.fin_time <= entry.tag_time)
         ]

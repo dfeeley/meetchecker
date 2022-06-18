@@ -21,8 +21,8 @@ class Checker(BaseChecker):
             raise ValueError(
                 f"No timing data found for record with name {self.record_name!r}"
             )
-        entries = data["entries"]
-        entries = entries.merge(
+        entry = data["entry"]
+        entry = entry.merge(
             records,
             left_on=[
                 "event_gender",
@@ -41,8 +41,8 @@ class Checker(BaseChecker):
                 "high_age",
             ],
         )
-        return entries.loc[
-            (entries.fin_stat != "R")
-            & (entries.fin_heat != 0)
-            & (entries.fin_time <= entries.record_time)
+        return entry.loc[
+            (entry.fin_stat != "R")
+            & (entry.fin_heat != 0)
+            & (entry.fin_time <= entry.record_time)
         ]
