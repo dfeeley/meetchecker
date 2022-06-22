@@ -160,6 +160,7 @@ def relay_calculated_fields(dataframe):
     dataframe["athlete_name"] = dataframe[["team_name", "team_ltr"]].agg(
         " - ".join, axis=1
     )
+    dataframe["actualseed_time"] = dataframe["actualseed_time"].replace(0, math.nan)
     return dataframe
 
 
@@ -170,6 +171,7 @@ def entry_calculated_fields(dataframe):
     dataframe["athlete_name"] = dataframe[["last_name", "first_name"]].agg(
         ", ".join, axis=1
     )
+    dataframe["actualseed_time"] = dataframe["actualseed_time"].replace(0, math.nan)
     return dataframe
 
 

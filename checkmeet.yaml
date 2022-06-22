@@ -8,18 +8,18 @@ checks:
       run: false
       checker: meetchecker.checkers.is_a_relay
   - new_rancho_pool_record:
-      run: false
+      run: true
       checker: meetchecker.checkers.set_new_record
       params: 
         record_name: '2022pool'
   - new_rancho_team_record:
-      run: false
+      run: true
       checker: meetchecker.checkers.set_new_record
       params: 
         record_name: '2022team'
         team_filter: 'RC'
   - bettered_county_time:
-      run: false
+      run: true
       checker: meetchecker.checkers.compare_vs_time_standard
       params:
         time_standard: CNTY
@@ -29,12 +29,12 @@ checks:
       params:
         time_standard: WHO
   - big_pop:
-      run: false
+      run: true
       checker: meetchecker.checkers.popped_by_percent_threshold
       params:
         threshold: 15.0
   - only_one_pad_time:
-      run: false
+      run: true
       checker: meetchecker.checkers.only_n_or_fewer_pad_times
       params:
         n: 1
@@ -45,7 +45,7 @@ checks:
       run: true
       checker: meetchecker.checkers.two_pad_times_and_inconsistent
       params:
-        threshold: 0.1
+        threshold: 1.0
   - all_in_heat_popped:
       run: false
       checker: meetchecker.checkers.all_in_heat_popped
