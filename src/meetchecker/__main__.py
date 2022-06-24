@@ -125,6 +125,14 @@ def accumulate_checks_by_lane(check_results):
     return accumulated
 
 
+def sort_results_normal(record):
+    return (record.event_no, record.fin_heat, record.fin_lane)
+
+
+def sort_results_reversed(record):
+    return (-record.event_no, record.fin_heat, record.fin_lane)
+
+
 def main():
     args = parse_args()
     logging.basicConfig(level=args.loglevel)
@@ -136,10 +144,14 @@ def main():
 
     lane_results = list(accumulate_checks_by_lane(check_results).values())
 
-    lane_results.sort(key=attrgetter("event_no", "fin_heat", "fin_lane"))
-
+    lane_results.sort(key=sort_results_normal)
     console_output(lane_results)
-    create_html_report(lane_results, meetfile=config["file"], output=config["output"])
+    output = pathlib.Path(config["output"])
+    create_html_report(lane_results, meetfile=config["file"], output=output)
+
+    lane_results.sort(key=sort_results_reversed)
+    reversed_output = output.parent / f"{output.stem}_rev{output.suffix}"
+    create_html_report(lane_results, meetfile=config["file"], output=reversed_output)
 
 
 def console_output(lane_results):

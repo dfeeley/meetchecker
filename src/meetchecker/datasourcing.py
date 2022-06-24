@@ -146,32 +146,34 @@ def calc_event_name(row):
 
 
 def calc_popped_by(row):
-    if row.actualseed_time and row.fin_time and row.actualseed_time > row.fin_time:
+    if row.actualseed_time and row.fin_time:
         return row.actualseed_time - row.fin_time
 
 
-def relay_calculated_fields(dataframe):
+def common_calculated_fields(dataframe):
     dataframe["event_name"] = dataframe.apply(calc_event_name, axis=1)
     dataframe["num_pad_times"] = dataframe.apply(calc_num_pad_times, axis=1)
     dataframe["max_pad_time"] = dataframe.apply(calc_max_pad_time, axis=1)
     dataframe["min_pad_time"] = dataframe.apply(calc_min_pad_time, axis=1)
     dataframe["pad_time_spread"] = dataframe["max_pad_time"] - dataframe["min_pad_time"]
     dataframe["popped_by"] = dataframe.apply(calc_popped_by, axis=1)
-    dataframe["athlete_name"] = dataframe[["team_name", "team_ltr"]].agg(
-        " - ".join, axis=1
-    )
     dataframe["actualseed_time"] = dataframe["actualseed_time"].replace(0, math.nan)
     return dataframe
 
 
+def relay_calculated_fields(dataframe):
+    dataframe = common_calculated_fields(dataframe)
+    dataframe["athlete_name"] = dataframe[["team_name", "team_ltr"]].agg(
+        " - ".join, axis=1
+    )
+    return dataframe
+
+
 def entry_calculated_fields(dataframe):
-    dataframe["event_name"] = dataframe.apply(calc_event_name, axis=1)
-    dataframe["num_pad_times"] = dataframe.apply(calc_num_pad_times, axis=1)
-    dataframe["popped_by"] = dataframe.apply(calc_popped_by, axis=1)
+    dataframe = common_calculated_fields(dataframe)
     dataframe["athlete_name"] = dataframe[["last_name", "first_name"]].agg(
         ", ".join, axis=1
     )
-    dataframe["actualseed_time"] = dataframe["actualseed_time"].replace(0, math.nan)
     return dataframe
 
 

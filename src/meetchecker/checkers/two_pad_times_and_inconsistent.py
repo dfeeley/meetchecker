@@ -8,7 +8,8 @@ class Checker(BaseChecker):
 
     def get_reason(self, row):
         return (
-            f"Only got 2 electronic times and they were {row.pad_time_spread:.2f} apart"
+            f"Only got 2 electronic times and they were {row.pad_time_spread:.2f} (which is more than "
+            f"our threshold of {self.threshold:.2f}) apart"
         )
 
     def check(self, data):
