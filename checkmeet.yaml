@@ -3,7 +3,7 @@
 # output: '/home/dave/Projects/meetchecker/resources/dsd.html'
 # file: '/home/dave/Projects/meetchecker/resources/MCC@RanchoMay2022.mdb'
 # output: '/home/dave/Projects/meetchecker/resources/mcc.html'
-file: '/home/dave/Projects/meetchecker/resources/SVST@Rancho2022-01.mdb'
+file: '/home/dave/Projects/meetchecker/resources/SVST@Rancho2022-02.mdb'
 output: '/home/dave/Projects/meetchecker/resources/svst.html'
 checks:
   - is_a_relay:
@@ -48,6 +48,8 @@ checks:
   - ns_but_pad_times:
       run: true
       checker: meetchecker.checkers.ns_but_pad_times
+      params:
+        pad_times: 1
   - two_pad_times_and_inconsistent:
       run: true
       checker: meetchecker.checkers.two_pad_times_and_inconsistent
