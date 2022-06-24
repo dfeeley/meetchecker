@@ -45,11 +45,6 @@ checks:
       checker: meetchecker.checkers.only_n_or_fewer_pad_times
       params:
         n: 1
-  - ns_but_pad_times:
-      run: true
-      checker: meetchecker.checkers.ns_but_pad_times
-      params:
-        pad_times: 1
   - two_pad_times_and_inconsistent:
       run: true
       checker: meetchecker.checkers.two_pad_times_and_inconsistent
