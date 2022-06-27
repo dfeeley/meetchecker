@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", default=None)
+    parser.add_argument("--console", action="store_true", default=False)
     parser.add_argument(
         "-q",
         "--quiet",
@@ -133,27 +134,6 @@ def sort_results_reversed(record):
     return (-record.event_no, record.fin_heat, record.fin_lane)
 
 
-def main():
-    args = parse_args()
-    logging.basicConfig(level=args.loglevel)
-    config = get_config(args.config)
-
-    data = get_data(config["file"])
-
-    check_results = run_checks(data, config["checks"])
-
-    lane_results = list(accumulate_checks_by_lane(check_results).values())
-
-    lane_results.sort(key=sort_results_normal)
-    console_output(lane_results)
-    output = pathlib.Path(config["output"])
-    create_html_report(lane_results, meetfile=config["file"], output=output)
-
-    lane_results.sort(key=sort_results_reversed)
-    reversed_output = output.parent / f"{output.stem}_rev{output.suffix}"
-    create_html_report(lane_results, meetfile=config["file"], output=reversed_output)
-
-
 def console_output(lane_results):
     for event_no, event_records_iter in itertools.groupby(
         lane_results, key=attrgetter("event_no")
@@ -170,3 +150,26 @@ def console_output(lane_results):
             for lane_result in heat_records:
                 print(f"  Lane {lane_result.fin_lane} {lane_result.athlete_name}")
                 print(lane_result.checks_as_str())
+
+
+def main():
+    args = parse_args()
+    logging.basicConfig(level=args.loglevel)
+    config = get_config(args.config)
+
+    data = get_data(config["file"])
+
+    check_results = run_checks(data, config["checks"])
+
+    lane_results = list(accumulate_checks_by_lane(check_results).values())
+
+    lane_results.sort(key=sort_results_normal)
+    if args.console:
+        console_output(lane_results)
+
+    output = pathlib.Path(config["output"])
+    create_html_report(lane_results, meetfile=config["file"], output=output)
+
+    lane_results.sort(key=sort_results_reversed)
+    reversed_output = output.parent / f"{output.stem}_rev{output.suffix}"
+    create_html_report(lane_results, meetfile=config["file"], output=reversed_output)

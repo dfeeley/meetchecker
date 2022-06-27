@@ -93,6 +93,58 @@ def report_header(meetfile):
         </p>"""
 
 
+def report_javascript(idle_duration=30):
+    return (
+        """
+        <script>
+        function getQueryVariable(variable)
+        {
+               var query = window.location.search.substring(1);
+               var vars = query.split("&");
+               for (var i=0;i<vars.length;i++) {
+                       var pair = vars[i].split("=");
+                       if(pair[0] == variable){return pair[1];}
+               }
+               return(false);
+        }
+
+
+        (function() {
+
+            if(getQueryVariable('refresh')) {
+                console.log('Refresh is enabled');
+        """
+        f"const idleDurationSecs = {idle_duration};"
+        """
+                const redirectUrl = location.href;
+                let idleTimeout; // variable to hold the timeout, do not modify
+
+                const resetIdleTimeout = function() {
+
+                    // Clears the existing timeout
+                    if(idleTimeout) clearTimeout(idleTimeout);
+
+                    // Set a new idle timeout to load the redirectUrl after idleDurationSecs
+                    idleTimeout = setTimeout(() => location.href = redirectUrl, idleDurationSecs * 1000);
+                };
+
+                // Init on page load
+                resetIdleTimeout();
+
+                // Reset the idle timeout on any of the events listed below
+                ['click', 'touchstart', 'mousemove'].forEach(evt =>
+                    document.addEventListener(evt, resetIdleTimeout, false)
+                );
+            } else {
+                console.log('Refresh is not enabled');
+            }
+
+        })();
+        </script>
+    """
+    )
+
+
 def create_html_report(lane_results, meetfile, output):
     out = []
     out.append("<html>")
@@ -103,6 +155,7 @@ def create_html_report(lane_results, meetfile, output):
     out.append(report_header(meetfile))
     adapter = LaneResultsHtmlAdapter(lane_results)
     out.append(adapter.generate_table())
+    out.append(report_javascript())
     out.append("</body>")
     out.append("</html>")
     with open(output, "w") as f:

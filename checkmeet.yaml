@@ -6,9 +6,6 @@
 file: '/home/dave/Projects/meetchecker/resources/SVST@Rancho2022-02.mdb'
 output: '/home/dave/Projects/meetchecker/resources/svst.html'
 checks:
-  - is_a_relay:
-      run: false
-      checker: meetchecker.checkers.is_a_relay
   - new_rancho_pool_record:
       run: true
       checker: meetchecker.checkers.set_new_record
