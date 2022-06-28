@@ -111,7 +111,8 @@ def report_javascript(idle_duration=30):
 
         (function() {
 
-            if(getQueryVariable('refresh')) {
+            let refresh = getQueryVariable('refresh')
+            if (refresh & refresh != '0') {
                 console.log('Refresh is enabled');
         """
         f"const idleDurationSecs = {idle_duration};"

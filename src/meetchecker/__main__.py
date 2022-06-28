@@ -164,12 +164,13 @@ def main():
     lane_results = list(accumulate_checks_by_lane(check_results).values())
 
     lane_results.sort(key=sort_results_normal)
-    if args.console:
-        console_output(lane_results)
-
     output = pathlib.Path(config["output"])
     create_html_report(lane_results, meetfile=config["file"], output=output)
 
+    if args.console:
+        console_output(lane_results)
+
+    # also output results in event-reversed order so that auto refresh puts latest results on top
     lane_results.sort(key=sort_results_reversed)
     reversed_output = output.parent / f"{output.stem}_rev{output.suffix}"
     create_html_report(lane_results, meetfile=config["file"], output=reversed_output)
