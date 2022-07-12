@@ -36,7 +36,7 @@ class Daemon:
         input_thread.start()
         start = time.time()
         elapsed = 0
-        with self.console.status("Meet Checker", spinner="aesthetic") as status:
+        with self.console.status("Meet Checker", spinner="bouncingBall") as status:
             while True:
                 time.sleep(0.5)
                 if not self.input_queue.empty():
@@ -58,7 +58,7 @@ class Daemon:
                     until_refresh = self.interval - elapsed
                     status.update(
                         self.create_status(until_refresh),
-                        spinner="aesthetic",
+                        spinner="bouncingBall",
                     )
 
                 if input == "q":
