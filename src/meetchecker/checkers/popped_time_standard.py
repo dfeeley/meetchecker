@@ -1,4 +1,5 @@
 from .base import BaseChecker
+from ..utils import emphasis as _
 
 
 class Checker(BaseChecker):
@@ -9,9 +10,13 @@ class Checker(BaseChecker):
     def get_reason(self, row):
         broke_standard_by = row.tag_time - row.fin_time
         broke_standard_by_pct = 100 * broke_standard_by / row.tag_time
-        return (
-            f"Time of {row.fin_time:.2f} would break {self.time_standard} standard of {row.tag_time:.2f} "
-            f"by {broke_standard_by:.2f} seconds / {broke_standard_by_pct:.1f}%"
+        return "".join(
+            [
+                f"Time of {row.fin_time:.2f} popped by {row.popped_by:.2f} seconds and would break ",
+                _(f"{self.time_standard}"),
+                f" standard of {row.tag_time:.2f} by ",
+                _(f"{broke_standard_by:.2f} seconds / {broke_standard_by_pct:.1f}%"),
+            ]
         )
 
     def check(self, data):
@@ -41,6 +46,11 @@ class Checker(BaseChecker):
         )
         return entry.loc[
             (entry.fin_stat != "R")
+            & (entry.fin_stat != "Q")
             & (entry.fin_heat != 0)
-            & (entry.fin_time <= entry.tag_time)
+            & (entry.popped_by > 0)  # popped their time
+            & (entry.fin_time <= entry.tag_time)  # reached the time standard
+            & (
+                entry.actualseed_time > entry.tag_time
+            )  # had not previously reached the time standard
         ]

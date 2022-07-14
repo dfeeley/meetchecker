@@ -9,11 +9,12 @@ from meetchecker.datasourcing import get_data
 from meetchecker.check import CheckRecord
 from meetchecker.checkers.base import BaseChecker
 from meetchecker.report import create_html_report
+from meetchecker.color_wheel import ColorWheel
 
 logger = logging.getLogger(__name__)
 
 
-NameReason = namedtuple("NameReason", "name reason")
+NameReasonColor = namedtuple("NameReason", "name reason color")
 
 
 class LaneResult:
@@ -25,7 +26,9 @@ class LaneResult:
         if self._result is None:
             self._result = check_result
         self.name_reasons.append(
-            NameReason(check_result.check_name, check_result.reason)
+            NameReasonColor(
+                check_result.check_name, check_result.reason, check_result.color
+            )
         )
 
     def num_exceptions(self):
@@ -90,13 +93,15 @@ def console_output(lane_results):
 
 def run_checks(data, checks):
     results = []
-    for check in checks:
-        name, check_config = check.popitem()
+    color_wheel = ColorWheel.from_checks(checks)
+    for name, check_config in checks.items():
         if not check_config.get("run", True):
             logger.info(f"{name!r} is set not to run, skipping it")
             continue
 
         checker = get_checker(name, check_config)
+        if checker.color is None:
+            checker.color = next(color_wheel)
         if not checker:
             continue
         try:
@@ -104,7 +109,9 @@ def run_checks(data, checks):
             if these_results is None:
                 logger.info(f"Check: {name}, no results!")
                 continue
-            adapted = CheckRecord.from_records(these_results.to_dict(orient="records"))
+            adapted = CheckRecord.from_records(
+                these_results.to_dict(orient="records"), color=checker.color
+            )
             logger.info(f"Check: {name}, {len(adapted)} results")
             results.extend(adapted)
         except (ValueError,) as ex:

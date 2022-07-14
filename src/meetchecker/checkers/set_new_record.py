@@ -1,4 +1,5 @@
 from .base import BaseChecker
+from ..utils import emphasis as _
 
 
 class Checker(BaseChecker):
@@ -9,9 +10,13 @@ class Checker(BaseChecker):
     def get_reason(self, row):
         broke_record_by = row.record_time - row.fin_time
         broke_record_by_pct = 100 * broke_record_by / row.record_time
-        return (
-            f"Time of {row.fin_time:.2f} would break {self.record_name!r} record  of {row.record_time:.2f} "
-            f"by {broke_record_by:.2f} seconds / {broke_record_by_pct:.1f} percent"
+        return "".join(
+            [
+                f"Time of {row.fin_time:.2f} would break ",
+                _(f"{self.record_name}"),
+                f" record  of {row.record_time:.2f} by ",
+                _(f"{broke_record_by:.2f} seconds / {broke_record_by_pct:.1f}%"),
+            ]
         )
 
     def check(self, data):

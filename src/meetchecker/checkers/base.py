@@ -1,6 +1,7 @@
 class BaseChecker:
     def __init__(self, **kwargs):
         self.name = kwargs.get("name", "Unnamed Checker")
+        self.color = kwargs.get("color")
 
     def run(self, data):
         filtered = self.check(data).copy()

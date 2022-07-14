@@ -17,12 +17,13 @@ class CheckRecord:
     fin_pad: float
     check_name: str
     reason: str
+    color: str
 
     @classmethod
-    def from_records(cls, records):
+    def from_records(cls, records, color=None):
         retv = []
         names = set([f.name for f in dataclasses.fields(cls)])
         for record in records:
             kwargs = {k: v for k, v in record.items() if k in names}
-            retv.append(cls(**kwargs))
+            retv.append(cls(color=color, **kwargs))
         return retv

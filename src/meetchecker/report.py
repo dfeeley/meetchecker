@@ -26,8 +26,16 @@ class LaneResultsHtmlAdapter:
                 event_records, key=attrgetter("fin_heat")
             ):
                 heat_records = list(heat_records_iter)
-                out.append('<tr class="heat"><td colspan="5">')
+                suspicious_heat = "suspicious" if len(heat_records) >= 3 else ""
+
+                out.append(
+                    f'<tr class="heat {suspicious_heat}"><td colspan="5" class="heat-title">'
+                )
                 out.append(f"Heat: {heat_records[0].fin_heat}")
+                if suspicious_heat:
+                    out.append(
+                        f"     Warning: {len(heat_records)} lanes with issues - could this be an incorrect file?"
+                    )
                 out.append("</td></tr>")
 
                 for lane_result in heat_records:
@@ -41,7 +49,9 @@ class LaneResultsHtmlAdapter:
                     out.append('<tr class="reasons"><td colspan="5"><ul>')
                     for name_reason in lane_result.name_reasons:
                         out.append(
-                            f'<li class="reason">{name_reason.name}: {name_reason.reason}</li>'
+                            f'<li class="reason">'
+                            f'<span class="checkname" style="color:{name_reason.color}">{name_reason.name}</span>: '
+                            f"{name_reason.reason}</li>"
                         )
                     out.append("</ul></td></tr>")
         out.append("</tbody></table>")
@@ -59,6 +69,7 @@ def inline_css():
 
           tr.heat td {
             border-bottom: 1px solid black;
+            font-weight: bold;
           }
 
           tr.heat td:first-of-type {
@@ -74,6 +85,18 @@ def inline_css():
           }
           .breadcrumb-title {
             font-weight: 700;
+          }
+          tr.suspicious {
+            background: #ff8888;
+            font-weight: bold;
+          }
+          li.reason > span.checkname {
+            font-weight: bold;
+            font-size: 1.1rem;
+          }
+          span.emphasis {
+            font-weight: bold;
+            font-size: 1.1rem;
           }
 }    </style>"""
     )
