@@ -15,6 +15,11 @@ checks:
     checker: meetchecker.checkers.popped_time_standard
     params: 
       time_standard: 'CNTY'
+  popped_lsc:
+    run: true
+    checker: meetchecker.checkers.popped_time_standard
+    params: 
+      time_standard: 'LSC'
   new_rancho_pool_record:
     run: true
     checker: meetchecker.checkers.set_new_record
