@@ -70,5 +70,8 @@ class Daemon:
 
     def open_in_browser(self):
         filepath = self.config["output"]
+        # adjust filepath for windows WSL
+        if filepath.startswith("/mnt/c/"):
+            filepath = filepath.replace("/mnt/c/", "/c:/")
         url = f"file://{filepath}"
         webbrowser.open(url)
