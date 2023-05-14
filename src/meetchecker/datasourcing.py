@@ -108,10 +108,14 @@ def get_data(mdb_filepath):
         data[table] = dump_and_load_table(mdb_filepath, table, columns[table])
     data = merge_tables(data)
     entry = entry_calculated_fields(data["entry"])
-    relay = relay_calculated_fields(data["relay"])
-    # concat entry and relay
-    data["entry"] = pd.concat([entry, relay], axis=0)
-    del data["relay"]
+    try:
+        relay = relay_calculated_fields(data["relay"])
+        # concat entry and relay
+        data["entry"] = pd.concat([entry, relay], axis=0)
+        del data["relay"]
+    except ValueError:
+        # if no relays, e.g. for time trials
+        pass
     return data
 
 
