@@ -21,6 +21,12 @@ def parse_args():
         help="Daemon mode, refresh on an interval",
     )
     parser.add_argument(
+        "--wsl",
+        action="store_true",
+        default=False,
+        help="Running under WSL on windows (required for webbrowser interaction)",
+    )
+    parser.add_argument(
         "-i", "--interval", type=int, default=60, help="Refresh interval in seconds"
     )
     parser.add_argument(
@@ -62,6 +68,6 @@ def main():
     logging.basicConfig(level=args.loglevel)
     config = get_config(args.config)
     if args.daemon:
-        Daemon(config, args.interval).run()
+        Daemon(config, args.interval, args.wsl).run()
     else:
         run(config["file"], config["output"], config["checks"])

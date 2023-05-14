@@ -3,6 +3,7 @@ import threading
 import time
 import queue
 from rich import console
+import subprocess
 import webbrowser
 
 
@@ -15,9 +16,10 @@ def add_input(input_queue):
 
 
 class Daemon:
-    def __init__(self, config, interval):
+    def __init__(self, config, interval, wsl):
         self.config = config
         self.interval = interval
+        self.wsl = wsl
         self.console = console.Console()
 
     def create_status(self, remaining):
@@ -70,8 +72,13 @@ class Daemon:
 
     def open_in_browser(self):
         filepath = self.config["output"]
-        # adjust filepath for windows WSL
-        if filepath.startswith("/mnt/c/"):
-            filepath = filepath.replace("/mnt/c/", "/c:/")
-        url = f"file://{filepath}"
-        webbrowser.open(url)
+        filepath += "?refresh=1"
+        if self.wsl:
+            # adjust filepath for windows WSL
+            if filepath.startswith("/mnt/c/"):
+                filepath = filepath.replace("/mnt/c/", "/c:/")
+            cmd = ["cmd.exe", "/C", "start", filepath]
+            subprocess.run(cmd, check=False, capture_output=False)
+        else:
+            url = f"file://{filepath}"
+            webbrowser.open(url)
