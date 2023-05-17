@@ -2,9 +2,6 @@
 file: '/path/to/somemeet.mdb'
 output: '/path/to/somemeet.htm'
 checks:
-  - is_a_relay:
-      run: false
-      checker: meetchecker.checkers.is_a_relay
   - new_pool_record:
       run: true
       checker: meetchecker.checkers.set_new_record
@@ -25,6 +22,10 @@ checks:
       checker: meetchecker.checkers.popped_by_percent_threshold
       params:
         threshold: 15.0
+  - big_disimprovement:
+      checker: meetchecker.checkers.disimproved_by_percent_threshold
+      params:
+        threshold: 20.0
   - only_one_pad_time:
       run: true
       checker: meetchecker.checkers.only_n_or_fewer_pad_times
