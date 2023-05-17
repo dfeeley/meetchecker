@@ -205,8 +205,8 @@ def merge_tables(data):
 def dump_and_load_table(mdb_filepath, table, columns):
     cmd = ["mdb-export", mdb_filepath, table]
     data = subprocess.check_output(cmd, encoding="utf-8")
-    with open(f"/tmp/{table}.csv", "w") as f:
-        f.write(data)
+    # with open(f"/tmp/{table}.csv", "w") as f:
+    #     f.write(data)
     df = pd.read_csv(
         io.StringIO(data),
         usecols=columns,
