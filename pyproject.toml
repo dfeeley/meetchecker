@@ -18,6 +18,7 @@ keywords = ["swim", "hytek", "meet manager"]
 dependencies = [
     "pandas",
 	"pyyaml",
+	"readchar",
 	"rich",
 ]
 requires-python = ">=3.10"

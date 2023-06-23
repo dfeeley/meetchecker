@@ -1,7 +1,9 @@
 import sys
 import threading
 import time
+import os
 import queue
+import readchar
 from rich import console
 import subprocess
 import webbrowser
@@ -12,7 +14,8 @@ from meetchecker.core import run
 
 def add_input(input_queue):
     while True:
-        input_queue.put(sys.stdin.readline(1))
+        input_queue.put(readchar.readchar())
+        time.sleep(0.1)
 
 
 class Daemon:
@@ -72,13 +75,11 @@ class Daemon:
 
     def open_in_browser(self):
         filepath = self.config["output"]
-        filepath += "?refresh=1"
+        url = f"file://{filepath}?refresh=1"
         if self.wsl:
             # adjust filepath for windows WSL
-            if filepath.startswith("/mnt/c/"):
-                filepath = filepath.replace("/mnt/c/", "/c:/")
-            cmd = ["cmd.exe", "/C", "start", filepath]
-            subprocess.run(cmd, check=False, capture_output=False)
+            url = url.replace("/mnt/c/", "c:/")
+            print('Unable to open browser directly under WSL, so please copy/paste the url:')
+            print(url)
         else:
-            url = f"file://{filepath}"
             webbrowser.open(url)
