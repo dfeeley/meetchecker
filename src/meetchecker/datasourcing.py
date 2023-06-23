@@ -3,6 +3,8 @@ import math
 import pandas as pd
 import subprocess
 
+import numpy as np
+
 STROKE = dict(
     A="Free",
     B="Back",
@@ -11,9 +13,8 @@ STROKE = dict(
     E="IM",
 )
 
-
-columns = dict(
-    athlete=["Ath_no", "Last_name", "First_name", "Team_no"],
+COLUMNS = dict(
+    athlete=["Ath_no", "Last_name", "First_name", "Pref_name", "Team_no"],
     team=["Team_no", "Team_abbr", "Team_name"],
     event=[
         "Event_no",
@@ -93,6 +94,33 @@ columns = dict(
 
 
 def get_data(mdb_filepath):
+    tables = extract_tables_from_mdb(mdb_filepath)
+    dump_tables(tables, "/tmp", overwrite=True)
+    dataframes = tables_to_dataframes(tables)
+    return post_process_dataframes(dataframes)
+
+
+def get_data_from_csvs(path):
+    tables = load_tables_from_csvs(path)
+    dataframes = tables_to_dataframes(tables)
+    return post_process_dataframes(dataframes)
+
+
+def post_process_dataframes(dataframes):
+    data = merge_tables(dataframes)
+    entry = entry_calculated_fields(data["entry"])
+    try:
+        relay = relay_calculated_fields(data["relay"])
+        # concat entry and relay
+        data["entry"] = pd.concat([entry, relay], axis=0)
+        del data["relay"]
+    except ValueError:
+        # if no relays, e.g. for time trials
+        pass
+    return data
+
+
+def old_get_data(mdb_filepath):
     data = {}
     for table in (
         "team",
@@ -105,7 +133,7 @@ def get_data(mdb_filepath):
         "recordtags",
         "relay",
     ):
-        data[table] = dump_and_load_table(mdb_filepath, table, columns[table])
+        data[table] = dump_and_load_table(mdb_filepath, table, COLUMNS[table])
     data = merge_tables(data)
     entry = entry_calculated_fields(data["entry"])
     try:
@@ -116,6 +144,53 @@ def get_data(mdb_filepath):
     except ValueError:
         # if no relays, e.g. for time trials
         pass
+    return data
+
+
+def extract_tables_from_mdb(mdb_filepath):
+    data = {}
+    for table in COLUMNS.keys():
+        cmd = ["mdb-export", mdb_filepath, table]
+        data[table] = subprocess.check_output(cmd, encoding="utf-8")
+    return data
+
+
+def dump_tables(tables, output_path, overwrite=False):
+    if (
+        any((output_path / f"{table}.csv").exists() for table in tables)
+        and overwrite is False
+    ):
+        raise ValueError(
+            f"Cannot dump tables to {output_path} as file(s) already exist and would be overwritten"
+        )
+    for name, table_data in tables.items():
+        with open(output_path / f"{name}.csv", "w") as f:
+            f.write(table_data)
+
+
+def tables_to_dataframes(tables):
+    ret = {}
+    for table_name, table_data in tables.items():
+        df = pd.read_csv(
+            io.StringIO(table_data),
+            usecols=COLUMNS[table_name],
+            converters={
+                "Last_name": str.strip,
+                "First_name": str.strip,
+                "Pref_name": str.strip,
+                "Team_name": str.strip,
+            },
+        )
+        ret[table_name] = df.rename(str.lower, axis="columns")
+    return ret
+
+
+def load_tables_from_csvs(path):
+    data = {}
+    for table_name in COLUMNS:
+        path_to_csv = path / f"{table_name}.csv"
+        with open(path_to_csv) as f:
+            data[table_name] = f.read()
     return data
 
 
@@ -175,7 +250,9 @@ def relay_calculated_fields(dataframe):
 
 def entry_calculated_fields(dataframe):
     dataframe = common_calculated_fields(dataframe)
-    dataframe["athlete_name"] = dataframe[["last_name", "first_name"]].agg(
+    dataframe["pref_name"] = dataframe.pref_name.replace("", np.nan)
+    dataframe["given_name"] = dataframe.pref_name.combine_first(dataframe.first_name)
+    dataframe["athlete_name"] = dataframe[["last_name", "given_name"]].agg(
         ", ".join, axis=1
     )
     return dataframe
@@ -213,7 +290,22 @@ def dump_and_load_table(mdb_filepath, table, columns):
         converters={
             "Last_name": str.strip,
             "First_name": str.strip,
+            "Pref_name": str.strip,
             "Team_name": str.strip,
         },
     )
     return df.rename(str.lower, axis="columns")
+
+
+def load_table_from_csv(folder, table, columns):
+    with open(folder / f"{table}.csv", "r") as f:
+        df = pd.read_csv(
+            f,
+            usecols=columns,
+            converters={
+                "Last_name": str.strip,
+                "First_name": str.strip,
+                "Team_name": str.strip,
+            },
+        )
+        return df.rename(str.lower, axis="columns")

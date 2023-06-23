@@ -27,6 +27,7 @@ dev = ["black", "pip-tools", "pytest"]
 
 [project.scripts]
 checkmeet = "meetchecker.__main__:main"
+dumpmeet = "meetchecker.dump:main"
 
 [tool.pytest.ini_options]
 testpaths = [
