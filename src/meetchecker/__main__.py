@@ -3,15 +3,25 @@ import logging
 import pathlib
 import yaml
 
+from rich.logging import RichHandler
+
 from meetchecker.core import run
 from meetchecker.daemon import Daemon
+from meetchecker.files import DotFile
+from meetchecker.files import Locations
 
 logger = logging.getLogger(__name__)
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--config", default=None)
+    parser.add_argument("database", nargs="?", default=None)
+    parser.add_argument("--ask", action="store_true", default=False)
+    parser.add_argument("-o", "--output", default=None)
+    parser.add_argument(
+        "--dotfile", default=pathlib.Path("~/.meetchecker.yaml").expanduser()
+    )
+    parser.add_argument("--checks", default=None)
     parser.add_argument("--console", action="store_true", default=False)
     parser.add_argument(
         "-d",
@@ -21,13 +31,7 @@ def parse_args():
         help="Daemon mode, refresh on an interval",
     )
     parser.add_argument(
-        "--wsl",
-        action="store_true",
-        default=False,
-        help="Running under WSL on windows (required for webbrowser interaction)",
-    )
-    parser.add_argument(
-        "-i", "--interval", type=int, default=60, help="Refresh interval in seconds"
+        "-i", "--interval", type=int, default=120, help="Refresh interval in seconds"
     )
     parser.add_argument(
         "-q",
@@ -49,25 +53,38 @@ def parse_args():
     return parser.parse_args()
 
 
-def find_config_file():
-    path = pathlib.Path("./checkmeet.yaml")
-    if path.exists():
-        return path
-
-
-def get_config(path):
-    config_path = pathlib.Path(path) if path else find_config_file()
-    if not config_path:
-        raise ValueError("No config file specified, and could not find one")
-    with open(config_path, "r") as f:
-        return yaml.safe_load(f)
-
-
 def main():
     args = parse_args()
-    logging.basicConfig(level=args.loglevel)
-    config = get_config(args.config)
+    logging.basicConfig(
+        level=args.loglevel,
+        format="%(message)s",
+        datefmt="[%X]",
+        handlers=[RichHandler()],
+    )
+
+    dotfile = DotFile(args.dotfile)
+    locations = Locations(dotfile.workdir)
+
+    database = locations.resolve_database(
+        args.database, args.ask, dotfile.last_database
+    )
+    output = locations.resolve_output(args.output, database)
+    checks_file = locations.resolve_checks(args.checks, dotfile.checks)
+
+    logging.info(f"DATABASE: {database}")
+    logging.info(f"OUTPUT: {output}")
+    logging.info(f"CHECKS: {checks_file}")
+
+    dotfile.last_database = str(database)
+
+    with open(checks_file) as f:
+        checks = yaml.safe_load(f)
+
     if args.daemon:
-        Daemon(config, args.interval, args.wsl).run()
+        Daemon(database, output, checks, args.interval).run()
     else:
-        run(config["file"], config["output"], config["checks"])
+        run(database, output, checks)
+
+
+if __name__ == "__main__":
+    main()

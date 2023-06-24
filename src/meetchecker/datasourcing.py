@@ -1,7 +1,9 @@
 import io
 import math
 import pandas as pd
+import pathlib
 import subprocess
+import tempfile
 
 import numpy as np
 
@@ -95,7 +97,7 @@ COLUMNS = dict(
 
 def get_data(mdb_filepath):
     tables = extract_tables_from_mdb(mdb_filepath)
-    dump_tables(tables, "/tmp", overwrite=True)
+    dump_tables(tables, pathlib.Path(tempfile.gettempdir()), overwrite=True)
     dataframes = tables_to_dataframes(tables)
     return post_process_dataframes(dataframes)
 

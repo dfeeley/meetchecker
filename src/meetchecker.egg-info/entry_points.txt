@@ -1,2 +1,3 @@
 [console_scripts]
 checkmeet = meetchecker.__main__:main
+dumpmeet = meetchecker.dump:main

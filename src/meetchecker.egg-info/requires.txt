@@ -1,4 +1,8 @@
 pandas
+pyyaml
+readchar
+rich
+inquirer
 
 [dev]
 black

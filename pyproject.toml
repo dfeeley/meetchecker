@@ -20,6 +20,7 @@ dependencies = [
 	"pyyaml",
 	"readchar",
 	"rich",
+	"inquirer",
 ]
 requires-python = ">=3.10"
 
