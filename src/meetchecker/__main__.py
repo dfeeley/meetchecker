@@ -22,7 +22,6 @@ def parse_args():
         "--dotfile", default=pathlib.Path("~/.meetchecker.yaml").expanduser()
     )
     parser.add_argument("--checks", default=None)
-    parser.add_argument("--console", action="store_true", default=False)
     parser.add_argument(
         "-d",
         "--daemon",
