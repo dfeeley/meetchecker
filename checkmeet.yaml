@@ -1,68 +1,57 @@
 ---
-# file: '/home/dave/Projects/meetchecker/resources/dsd-01.mdb'
-# output: '/home/dave/Projects/meetchecker/resources/dsd.html'
-# file: '/home/dave/Projects/meetchecker/resources/MCC@RanchoMay2022.mdb'
-# output: '/home/dave/Projects/meetchecker/resources/mcc.html'
-# file: '/home/dave/Projects/meetchecker/resources/SVST@Rancho2022-02.mdb'
-# output: '/home/dave/Projects/meetchecker/resources/svst.html'
-# file: '/home/dave/Projects/meetchecker/resources/dewing-good.mdb'
-# output: '/home/dave/Projects/meetchecker/resources/dewing-good.html'
-file: '/home/dave/Projects/meetchecker/resources/dewing-bad.mdb'
-output: '/home/dave/Projects/meetchecker/resources/dewing-bad.html'
-checks:
-  popped_county:
-    run: true
-    checker: meetchecker.checkers.popped_time_standard
-    params: 
-      time_standard: 'CNTY'
-  popped_lsc:
-    run: true
-    checker: meetchecker.checkers.popped_time_standard
-    params: 
-      time_standard: 'LSC'
-  new_rancho_pool_record:
-    run: true
-    checker: meetchecker.checkers.set_new_record
-    params: 
-      record_name: '2022pool'
-  new_rancho_team_record:
-    run: true
-    checker: meetchecker.checkers.set_new_record
-    params: 
-      record_name: '2022team'
-      team_filter: 'RC'
-  bettered_county_time:
-    run: false
-    checker: meetchecker.checkers.compare_vs_time_standard
-    params:
-      time_standard: CNTY
-  bettered_wahoo_time:
-    run: false
-    checker: meetchecker.checkers.compare_vs_time_standard
-    params:
-      time_standard: WHO
-  big_pop:
-    run: true
-    checker: meetchecker.checkers.popped_by_percent_threshold
-    params:
-      threshold: 20.0
-  big_disimprovement:
-    run: true
-    checker: meetchecker.checkers.disimproved_by_percent_threshold
-    params:
-      threshold: 20.0
-  only_one_pad_time:
-    run: false
-    checker: meetchecker.checkers.only_n_or_fewer_pad_times
-    params:
-      n: 1
-  two_pad_times_and_inconsistent:
-    run: true
-    checker: meetchecker.checkers.two_pad_times_and_inconsistent
-    params:
-      threshold: 1.0
-  all_in_heat_popped:
-    run: false
-    checker: meetchecker.checkers.all_in_heat_popped
-    params:
-      min_swimmers: 3
+popped_county:
+  run: true
+  checker: meetchecker.checkers.popped_time_standard
+  params: 
+    time_standard: 'CNTY'
+popped_lsc:
+  run: true
+  checker: meetchecker.checkers.popped_time_standard
+  params: 
+    time_standard: 'LSC'
+new_rancho_pool_record:
+  run: true
+  checker: meetchecker.checkers.set_new_record
+  params: 
+    record_name: '2022pool'
+new_rancho_team_record:
+  run: true
+  checker: meetchecker.checkers.set_new_record
+  params: 
+    record_name: '2022team'
+    team_filter: 'RC'
+bettered_county_time:
+  run: false
+  checker: meetchecker.checkers.compare_vs_time_standard
+  params:
+    time_standard: CNTY
+bettered_wahoo_time:
+  run: false
+  checker: meetchecker.checkers.compare_vs_time_standard
+  params:
+    time_standard: WHO
+big_pop:
+  run: true
+  checker: meetchecker.checkers.popped_by_percent_threshold
+  params:
+    threshold: 20.0
+big_disimprovement:
+  run: true
+  checker: meetchecker.checkers.disimproved_by_percent_threshold
+  params:
+    threshold: 20.0
+only_one_pad_time:
+  run: false
+  checker: meetchecker.checkers.only_n_or_fewer_pad_times
+  params:
+    n: 1
+two_pad_times_and_inconsistent:
+  run: true
+  checker: meetchecker.checkers.two_pad_times_and_inconsistent
+  params:
+    threshold: 1.0
+all_in_heat_popped:
+  run: false
+  checker: meetchecker.checkers.all_in_heat_popped
+  params:
+  min_swimmers: 3
