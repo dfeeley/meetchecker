@@ -3,7 +3,6 @@ MANIFEST.in
 README.md
 pyproject.toml
 setup.py
-src/adhoc.py
 src/meetchecker/__main__.py
 src/meetchecker/check.py
 src/meetchecker/color_wheel.py

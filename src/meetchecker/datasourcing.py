@@ -16,7 +16,17 @@ STROKE = dict(
 )
 
 COLUMNS = dict(
-    athlete=["Ath_no", "Last_name", "First_name", "Pref_name", "Team_no"],
+    athlete=[
+        "Ath_no",
+        "Last_name",
+        "First_name",
+        "Initial",
+        "Ath_Sex",
+        "Birth_date",
+        "Reg_no",
+        "Pref_name",
+        "Team_no",
+    ],
     team=["Team_no", "Team_abbr", "Team_name"],
     event=[
         "Event_no",
@@ -122,33 +132,6 @@ def post_process_dataframes(dataframes):
     return data
 
 
-def old_get_data(mdb_filepath):
-    data = {}
-    for table in (
-        "team",
-        "event",
-        "athlete",
-        "entry",
-        "tagnames",
-        "timestd",
-        "records",
-        "recordtags",
-        "relay",
-    ):
-        data[table] = dump_and_load_table(mdb_filepath, table, COLUMNS[table])
-    data = merge_tables(data)
-    entry = entry_calculated_fields(data["entry"])
-    try:
-        relay = relay_calculated_fields(data["relay"])
-        # concat entry and relay
-        data["entry"] = pd.concat([entry, relay], axis=0)
-        del data["relay"]
-    except ValueError:
-        # if no relays, e.g. for time trials
-        pass
-    return data
-
-
 def extract_tables_from_mdb(mdb_filepath):
     data = {}
     for table in COLUMNS.keys():
@@ -181,6 +164,7 @@ def tables_to_dataframes(tables):
                 "First_name": str.strip,
                 "Pref_name": str.strip,
                 "Team_name": str.strip,
+                "Team_abbr": str.strip,
             },
         )
         ret[table_name] = df.rename(str.lower, axis="columns")
@@ -274,6 +258,7 @@ def merge_tables(data):
     relay = relay.merge(event, left_on="event_ptr", right_on="event_ptr")
     entry = entry.merge(event, left_on="event_ptr", right_on="event_ptr")
     return dict(
+        athlete=athlete,
         entry=entry,
         relay=relay,
         time_standards=time_standards,
