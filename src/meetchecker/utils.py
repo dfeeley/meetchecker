@@ -21,3 +21,7 @@ def select_from_user(choices, message="Please select one", color="blue"):
     answer = inquirer.prompt(questions)
     if answer:
         return answer.get("key")
+
+
+def approx_equals(float1, float2, epsilon=0.001):
+    return abs(float1 - float2) <= epsilon
